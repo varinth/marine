@@ -1,0 +1,101 @@
+---
+title: "ทดสอบ Flex Dashboard"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+```
+Bangkok
+======================
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Chon Buri
+
+จังหวัดชลบุรี มีพื้นที่ 4,363 ตารางกิโลเมตร มีที่ราบชายฝั่งทะเลตั้งแต่ปากแม่น้ำบางปะกงถึงอำเภอสัตหีบ คิดเป็นความยาวประมาณ 170 กิโลเมตร มีหาดทรายสวยงามหลายแห่งซึ่งได้รับการพัฒนาเป็นแหล่งท่องเที่ยวที่สำคัญ มีเกาะ 47 เกาะ เช่น เกาะสีชัง เกาะแสมสาร เกาะล้าน เกาะครก เกาะสากและเกาะไผ่ อุณหภูมิเฉลี่ยรายปี 29 องศาเซลเซียส ปริมาณน้ำฝนเฉลี่ยรายปี 1,368.82 มิลลิเมตร แบ่งเขตการปกครองออกเป็น 11 อำเภอ 92 ตำบล 687 หมู่บ้าน มีประชากรรวมทั้งสิ้น 1,535,445 คน (เน้นชุมชนชายฝั่ง)
+
+
+```{r}
+library(readxl)
+library(leaflet)
+
+coord <- read_xlsx("Coordinates.Xlsx",
+                   sheet = "Sheet1")
+
+leaflet(data = coord) %>%
+  addTiles() %>%
+  addMarkers(lng = ~longitude,
+             lat = ~latitude)
+leaflet(data = coord) %>%
+  addTiles() %>%
+  addMarkers(data = coord,
+             lng = ~longitude,
+             lat = ~latitude,
+             popup = ~station)
+```
+### Chon Buri (2)
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Disolved Oxygen (table)
+
+```{r}
+
+library(tidyverse)
+
+WQ <- read_xlsx("../2022/WQ.Xlsx", 
+                sheet = "clone (2)")
+
+table01 <- WQ %>%
+  group_by(province, monsoon) %>%
+  summarise(mean(DO),
+            sd(DO))
+
+
+
+```
+
+
+```{r table01, echo=FALSE}
+
+knitr::kable(table01,
+             digits = 2,
+             col.names = c("Province",
+                          "Season",
+                           "DO",
+                           "SD"),
+caption = "ตารางที่ 1.
+ค่าออกซิเจนละลายแต่ละจังหวัด")
+``
+
+### Samut prakan
+```
+```{r table01, echo=FALSE}
+```{r Fig01, echo=FALSE, fig.cap="ภาพที่ 1 ค่าออกซิเจน
+
+table01 %>%
+ ggplot(aes(x = province,
+            y = `mean(DO)`)) +
+ geom_col(aes(fill = monsoon),
+          position = position_dodge(0.8),
+          width = 0.7) +
+ geom_errorbar(aes(ymin = `mean(DO)` - `sd(DO)`,
+      ymax = `mean(DO)` + `sd(DO)`,
+      group = monsoon),
+    width = 0.3,
+    position = position_dodge(0.8)) +
+  labs(x = "Province | จังหวัด",
+    y = "ปริมาณออกซิเจน")
+  
+```{r table01, echo=FALSE}
+```
+Chon Buri
+======================
+
+Samut prakan
+======================
